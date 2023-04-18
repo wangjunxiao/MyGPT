@@ -24,7 +24,7 @@ from transformers.utils.versions import require_version
 require_version("tokenizers>=0.13.3")
 
 if is_sentencepiece_available():
-    from .tokenization_llama import LlamaTokenizer
+    from tokenization_llama import LlamaTokenizer
 else:
     LlamaTokenizer = None
 

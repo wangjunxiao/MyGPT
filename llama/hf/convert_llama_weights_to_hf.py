@@ -21,11 +21,13 @@ import warnings
 
 import torch
 
-from transformers import LlamaConfig, LlamaForCausalLM, LlamaTokenizer
+from configuration_llama import LlamaConfig
+from modeling_llama import LlamaForCausalLM
+from tokenization_llama import LlamaTokenizer
 
 
 try:
-    from transformers import LlamaTokenizerFast
+    from tokenization_llama_fast import LlamaTokenizerFast
 except ImportError as e:
     warnings.warn(e)
     warnings.warn(
@@ -264,6 +266,10 @@ def main():
         help="Location to write HF model and tokenizer",
     )
     args = parser.parse_args()
+    args.input_dir = "../../llama_model/"
+    args.model_size = "7B"
+    args.output_dir = "llama_model_hf2/"
+
     if args.model_size != "tokenizer_only":
         write_model(
             model_path=args.output_dir,
@@ -275,4 +281,15 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+
+    # from transformers import AutoTokenizer
+    # tokenizer = AutoTokenizer.from_pretrained("llama_model_hf2/")
+    # tokenizer = LlamaTokenizer.from_pretrained("llama_model_hf2/")
+    tokenizer = LlamaTokenizerFast.from_pretrained("llama_model_hf2/")
+    model = LlamaForCausalLM.from_pretrained("llama_model_hf2/")
+
+    prompt = "Hey, are you consciours? Can you talk to me?"
+    inputs = tokenizer(prompt, return_tensors="pt")
+    generate_ids = model.generate(inputs.input_ids, max_length=30)
+    print(tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0])
